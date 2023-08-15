@@ -1,48 +1,57 @@
-NAME	= 	minilibx_test
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: bbessard <bbessard@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/08/14 17:59:01 by bbessard          #+#    #+#              #
+#    Updated: 2023/08/15 11:48:28 by bbessard         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-CC		=	gcc
+NAME    =   fdf
 
-CFLAGS	=	-Wall -Wextra -Werror -O3 -g -fsanitize=address
+CC      =   gcc
 
-SRCS=	$(wildcard srcs/*.c)
+CFLAGS  =   -Wall -Wextra -Werror -O3 #-g -fsanitize=address
 
-INCLUDES	=	includes/
+SRCS := $(wildcard srcs/*.c)
 
-INCLUDES_PATH	=	/minilibx_test/includes
+INCLUDES =   includes/
 
-OBJ	=	$(SRCS:.c=.o)
+OBJS    =   $(SRCS:srcs/%.c=%.o)
 
-RM	=	rm -f
+RM      =   rm -f
 
-MLX		= 	-L ./minilibx -l mlx -framework OpenGL -framework AppKit
-
-MLX_PATH = minilibx_macos
-MLX_INC = -I$(MLX_PATH)
-MLX_LIB = -L$(MLX_PATH) -lmlx -framework OpenGL -framework AppKit
-
-all:	lib $(NAME)
+MLX     =   -L ./minilibx -l mlx -framework OpenGL -framework AppKit
 
 lib:
-	make -C minilibx_macos/
 	make -C libft/
+	make -C minilibx_macos/
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -Lminilibx_macos -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+all:    lib $(NAME)
 
-%.o: srcs/%.c
-	$(CC) $(CFLAGS) $(MLX_INC) -I$(INCLUDES) -c $< -o $@
+$(NAME):    $(OBJS)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDES) -Llibft -lft $(MLX)
 
+%.o: $(SRCS)
+	$(CC) $(CFLAGS) -o $@ -c $< -I $(INCLUDES)
+
+clean_srcs:
+	${RM} $(OBJS)
+	
 clean:
-	$(RM) $(NAME)
-	@make -C minilibx_macos clean
+	${RM} $(OBJS)
 	@make -C libft clean
+	@make -C minilibx_macos clean
 
-fclean:		clean
-	$(RM) $(NAME) 
-	$(RM) srcs/*.o
-	@make -C minilibx_macos fclean
-	@make -C libft fclean
+fclean:     clean
+	$(RM) $(NAME)
+	${RM} fdf libft/libft.a
+	@make -C libft/ fclean
+	@make -C minilibx_macos/ fclean
 
-re:		fclean all
+re:             fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:             all  clean fclean re
